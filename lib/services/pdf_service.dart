@@ -146,9 +146,14 @@ class PdfService {
     try {
       final data = await rootBundle.load(asset);
       return pw.MemoryImage(data.buffer.asUint8List());
-    } on Exception {
+    } catch (_) {
       // Un logo absent du paquet n'empêche pas d'éditer une fiche : il se
       // choisit depuis la galerie du téléphone, dans Réglages → Sociétés.
+      //
+      // On attrape tout et pas seulement les Exception : un asset manquant
+      // lève une FlutterError, qui est une Error. Un `on Exception` la
+      // laissait filer, et la génération du PDF échouait au lieu de se
+      // passer du logo.
       return null;
     }
   }

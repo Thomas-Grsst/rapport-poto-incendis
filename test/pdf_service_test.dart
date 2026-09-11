@@ -80,6 +80,37 @@ void main() {
       expect(bytes.length, greaterThan(2000));
     });
 
+    test('un logo absent du paquet ne bloque pas la génération', () async {
+      // Les sociétés livrées déclarent leur logo dans assets/images/, mais le
+      // fichier peut ne pas y être : la fiche doit alors sortir avec la
+      // raison sociale à la place, et surtout sortir. Un asset manquant lève
+      // une FlutterError, c'est-à-dire une Error et non une Exception — le
+      // premier `on Exception` la laissait filer et cassait l'export.
+      final bytes = await service.buildFichePdf(
+        fiche: sampleFiche(),
+        company: const Company(
+          id: Company.ter2eauxId,
+          name: 'TER2EAUX',
+          logoAsset: 'assets/images/logo-qui-nexiste-pas.png',
+        ),
+      );
+      dump('fiche-sans-logo.pdf', bytes);
+
+      expect(bytes.length, greaterThan(2000));
+    });
+
+    test('les sociétés livrées s’impriment telles quelles', () async {
+      // Le vrai cas de figure : on génère une fiche pour Ter2eaux ou Rezeau
+      // sans avoir rien touché aux réglages.
+      for (final company in Company.bundled) {
+        final bytes = await service.buildFichePdf(
+          fiche: sampleFiche(),
+          company: company,
+        );
+        expect(bytes.length, greaterThan(2000), reason: company.id);
+      }
+    });
+
     test('les photos manquantes laissent leur cadre en place', () async {
       final fiche = sampleFiche();
       expect(fiche.photoOf(PhotoSlot.hydrant), isNull);

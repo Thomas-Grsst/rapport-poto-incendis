@@ -91,7 +91,10 @@ class _FicheDetailScreenState extends State<FicheDetailScreen> {
 
       if (!mounted) return;
       await _showPdfActions(fiche, pdf);
-    } on Exception catch (error) {
+    } catch (error) {
+      // Tout est attrapé, pas seulement les Exception : une police ou un
+      // logo introuvable lève une Error, et l'intervenant doit lire ce qui
+      // s'est passé plutôt que de voir l'écran planter au bord d'une route.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Échec de la génération du PDF : $error')),
@@ -128,7 +131,7 @@ class _FicheDetailScreenState extends State<FicheDetailScreen> {
           ),
         ),
       );
-    } on Exception catch (error) {
+    } catch (error) {
       if (!mounted) return;
       messenger.showSnackBar(
         SnackBar(content: Text('Téléchargement impossible : $error')),

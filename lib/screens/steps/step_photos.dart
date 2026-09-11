@@ -67,7 +67,7 @@ class _PhotosStepState extends State<PhotosStep> {
       // photo de terrain ne se reprend pas, et une erreur d'import ne doit
       // pas laisser le cadre vide.
       await storage.deleteFileIfExists(previous?.filePath);
-    } on Exception catch (error) {
+    } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Impossible d'ajouter la photo : $error")),
