@@ -1,0 +1,69 @@
+name: poteaux_incendie
+description: >-
+  Fiches de controle des poteaux d'incendie, remplies au pied de l'appareil :
+  debits, pressions, photos et PDF mis en page. Tout reste sur l'appareil,
+  sans compte ni connexion.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  # Dart 3.6 = Flutter 3.27, première version où ThemeData.cardTheme attend un
+  # CardThemeData et où PopScope expose onPopInvokedWithResult.
+  sdk: ">=3.6.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Laisse pub choisir la version d'intl compatible avec le SDK Flutter installe.
+  intl: any
+
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.2
+  uuid: ^4.4.0
+
+  path: ^1.9.0
+  # path_provider n'a pas d'implementation web : il n'est importe que par le
+  # stockage sur fichiers, choisi par import conditionnel sur mobile.
+  path_provider: ^2.1.4
+  # Son implementation Android est bornee avant 2.3.0 : a partir de la, elle
+  # passe par le paquet `jni`, qui compile du C++ et reclame donc le NDK
+  # Android. Gradle tente alors de le telecharger a chaque compilation, et la
+  # construction de l'APK echoue sur un poste dont le sdkmanager ne le fait
+  # pas — pour du code qui n'a besoin que du chemin du dossier documents.
+  path_provider_android: ">=2.2.0 <2.3.0"
+
+  # Lecture d'un fichier choisi par l'utilisateur, quelle que soit la
+  # plateforme (chemin sur mobile, URL de blob dans un navigateur).
+  cross_file: ^0.3.4
+  # Stockage du navigateur, utilise par la version web de StorageService.
+  web: ^1.1.0
+
+  image_picker: ^1.1.2
+
+  pdf: ^3.11.0
+  # Genere, affiche, imprime et partage le PDF. Il fait aussi le partage, ce
+  # qui evite share_plus : celui-ci applique le plugin Gradle Kotlin, que les
+  # futures versions de Flutter refuseront.
+  printing: ^5.13.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Polices du PDF. Les polices intégrées au format PDF ne couvrent pas le
+  # « œ » ni le tiret cadratin ; les embarquer garantit que la fiche
+  # s'imprime à l'identique partout, sans connexion.
+  # Roboto — Apache License 2.0, voir assets/fonts/LICENSE.txt
+  assets:
+    - assets/fonts/
+    # Les logos des deux sociétés, imprimés tant qu'aucun n'a été choisi
+    # dans les réglages, pour que les fiches sortent en-tête complète dès la
+    # première ouverture.
+    - assets/images/

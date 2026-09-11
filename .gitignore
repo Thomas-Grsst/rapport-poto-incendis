@@ -1,0 +1,38 @@
+# Fichiers générés par Dart / Flutter
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+*.log
+
+# Outils
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Android — spécifique à la machine
+android/.gradle/
+android/local.properties
+android/key.properties
+android/app/*.jks
+android/app/*.keystore
+
+# iOS / macOS — installé par pod install
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/ServiceDefinitions.json
+macos/Pods/
+
+# Système
+.DS_Store
+Thumbs.db

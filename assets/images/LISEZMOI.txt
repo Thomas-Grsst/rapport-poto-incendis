@@ -1,0 +1,17 @@
+Les logos des deux societes, imprimes en tete des fiches.
+
+    logo-ter2eaux.png
+    logo-rezeau.png
+
+Deposez-les ici et ils seront livres avec l'application : un PNG a fond
+transparent ou blanc, large d'un millier de pixels, suffit largement.
+
+Sans eux, la fiche imprime la raison sociale a la place du logo — et chacun
+peut de toute facon choisir le sien depuis la galerie de son telephone, dans
+Reglages -> Societes -> Logo, sans toucher au depot.
+
+Aucun logo generique n'est livre de repli : celui d'une autre entreprise en
+tete d'une fiche vaudrait moins que rien.
+
+Apres avoir depose logo-ter2eaux.png, `python3 tool/icone.py` le reprend sur
+la banniere du Play Store.
