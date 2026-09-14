@@ -22,10 +22,44 @@ void main() {
           containsAll(<String>[Company.ter2eauxId, Company.rezeauId]));
     });
 
-    test('elles sont livrées sans adresse, donc à compléter', () {
-      // Personne n'a saisi ces mentions : les inventer serait pire que de
-      // les demander, une fiche portant un faux SIRET n'ayant aucune valeur.
-      expect(settings.companies.every((c) => c.needsSetup), isTrue);
+    test('elles sont livrées prêtes à imprimer, rien à saisir', () {
+      // Sans adresse, une fiche sortirait sans en-tete ni mentions legales,
+      // et l'accueil afficherait un rappel a completer. Les deux societes
+      // arrivent renseignees : l'application s'installe et sert aussitot.
+      expect(settings.companies.every((c) => c.needsSetup), isFalse);
+    });
+
+    test('elles portent les mentions du registre du commerce', () {
+      // Verrouille ce qui s'imprime en pied de chaque fiche. Une faute de
+      // frappe dans un SIRET ne se voit pas a l'ecran, seulement sur le PDF
+      // deja envoye au client.
+      final ter2eaux = settings.companyFor(Company.ter2eauxId);
+      expect(ter2eaux.displayName, "SAS TER'2EAUX");
+      expect(ter2eaux.addressOneLine, 'Allée des Tanneurs - 01600 TREVOUX');
+      expect(ter2eaux.siret, '95071699300015');
+      expect(ter2eaux.capital, '5 000,00 €');
+
+      final rezeau = settings.companyFor(Company.rezeauId);
+      expect(rezeau.displayName, 'SAS REZEAU');
+      expect(rezeau.addressOneLine, '2140, Route de Charnay - 69480 MORANCE');
+      expect(rezeau.siret, '84510281300027');
+      expect(rezeau.email, 'contact@rezeau.fr');
+    });
+
+    test('leur numéro de TVA découle du SIREN', () {
+      // Le numero intracommunautaire n'est pas attribue au hasard : c'est FR,
+      // une cle, puis le SIREN. Recalculer la cle ici prouve que les deux
+      // numeros livres sont coherents avec les SIRET ci-dessus, plutot que
+      // recopies de travers.
+      String attendu(String siret) {
+        final siren = int.parse(siret.substring(0, 9));
+        final cle = (12 + 3 * (siren % 97)) % 97;
+        return 'FR${cle.toString().padLeft(2, '0')}$siren';
+      }
+
+      for (final company in settings.companies) {
+        expect(company.vatNumber, attendu(company.siret), reason: company.id);
+      }
     });
 
     test('modifier une société ne touche pas à l’autre', () async {
@@ -34,7 +68,7 @@ void main() {
       );
 
       expect(settings.companyFor(Company.rezeauId).city, 'ANGERS');
-      expect(settings.companyFor(Company.ter2eauxId).city, isEmpty);
+      expect(settings.companyFor(Company.ter2eauxId).city, 'TREVOUX');
     });
 
     test('une fiche dont la société a disparu s’imprime quand même', () {

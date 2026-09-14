@@ -197,23 +197,47 @@ class Company {
   static const String ter2eauxId = 'ter2eaux';
   static const String rezeauId = 'rezeau';
 
-  /// Ter2eaux et Rezeau, telles qu'elles sont proposees a la creation d'une
+  /// Ter'2eaux et Rezeau, telles qu'elles sont proposees a la creation d'une
   /// fiche.
   ///
-  /// Seuls le nom, le logo et le site sont livres remplis : l'adresse, le
-  /// SIRET et les autres mentions legales se saisissent dans
-  /// Réglages → Sociétés, une fois pour toutes. Rien n'est invente ici — une
-  /// fiche qui sortirait avec un faux SIRET serait pire qu'une fiche sans.
+  /// Les mentions legales viennent du registre du commerce, pas d'une
+  /// approximation : une fiche qui sortirait avec un faux SIRET serait pire
+  /// qu'une fiche sans. Ce qui n'a pas ete trouve reste vide, et se saisit
+  /// dans Réglages → Sociétés.
+  ///
+  /// Les numeros de TVA se deduisent du SIREN par la regle publiee —
+  /// FR, puis (12 + 3 × (SIREN modulo 97)) modulo 97, puis le SIREN.
   static const List<Company> bundled = <Company>[
     Company(
       id: ter2eauxId,
-      name: 'TER2EAUX',
+      legalForm: 'SAS',
+      name: "TER'2EAUX",
+      addressLine: 'Allée des Tanneurs',
+      postalCode: '01600',
+      city: 'TREVOUX',
+      website: 'www.ter2eaux.fr',
+      siret: '95071699300015',
+      ape: '7112B',
+      rcs: 'BOURG EN BRESSE 950 716 993',
+      vatNumber: 'FR45950716993',
+      capital: '5 000,00 €',
       logoAsset: 'assets/images/logo-ter2eaux.png',
     ),
     Company(
       id: rezeauId,
+      legalForm: 'SAS',
       name: 'REZEAU',
+      addressLine: '2140, Route de Charnay',
+      postalCode: '69480',
+      city: 'MORANCE',
+      phone: '04 78 22 41 42',
+      email: 'contact@rezeau.fr',
       website: 'www.rezeau.fr',
+      siret: '84510281300027',
+      ape: '7120B',
+      rcs: 'VILLEFRANCHE-TARARE 845 102 813',
+      vatNumber: 'FR51845102813',
+      capital: '10 000,00 €',
       logoAsset: 'assets/images/logo-rezeau.png',
     ),
   ];
