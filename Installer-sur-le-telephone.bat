@@ -18,14 +18,23 @@ echo.
 echo   Le telephone doit etre branche en USB.
 echo.
 
-echo   [1/2] Recuperation de la derniere version...
+echo   [1/3] Recuperation de la derniere version...
 echo.
 git pull
 if errorlevel 1 goto erreur
 
 echo.
-echo   [2/2] Compilation et installation...
+echo   [2/3] Compilation de la nouvelle version...
 echo   (c'est la partie longue, laissez faire)
+echo.
+REM  `flutter install` ne compile pas : il installe l'APK deja present sur le
+REM  disque. Sans cette etape, le `git pull` ci-dessus ne servait a rien et on
+REM  reinstallait indefiniment la version precedente.
+flutter build apk --release
+if errorlevel 1 goto erreur
+
+echo.
+echo   [3/3] Installation sur le telephone...
 echo.
 flutter install --release
 if errorlevel 1 goto erreur
