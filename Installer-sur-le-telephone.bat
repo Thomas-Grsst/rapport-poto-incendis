@@ -56,24 +56,41 @@ REM  "Missing argument".
 if "%TELEPHONE%"=="" goto pas_de_telephone
 echo   Telephone trouve : %TELEPHONE%
 
+REM  Le processeur du telephone decide quel APK lui convient. On lit la reponse
+REM  avec findstr plutot que de composer un nom de fichier a partir d'elle :
+REM  adb termine ses lignes par un retour chariot que le nom traine ensuite.
+set "APK="
+"%ADB%" -s %TELEPHONE% shell getprop ro.product.cpu.abi > "%TEMP%\abi-android.txt" 2>&1
+findstr /C:"arm64-v8a" "%TEMP%\abi-android.txt" >nul && set "APK=app-arm64-v8a-release.apk"
+if not defined APK findstr /C:"armeabi-v7a" "%TEMP%\abi-android.txt" >nul && set "APK=app-armeabi-v7a-release.apk"
+if not defined APK findstr /C:"x86_64" "%TEMP%\abi-android.txt" >nul && set "APK=app-x86_64-release.apk"
+if not defined APK set "APK=app-arm64-v8a-release.apk"
+
 echo.
 echo   [3/4] Compilation de la nouvelle version...
 echo   (c'est la partie longue, laissez faire)
 echo.
-REM  `flutter install` ne compile pas : il installe l'APK deja present sur le
-REM  disque. Sans cette etape, le `git pull` ci-dessus ne servirait a rien.
+REM  `--split-per-abi` fabrique un APK par processeur. C'est le meme reglage
+REM  que le fichier qui prepare un APK a envoyer, et c'est voulu : Android
+REM  numerote ces APK differemment de l'APK universel, et refuse d'installer
+REM  par-dessus une version qu'il juge plus ancienne. Les deux fichiers
+REM  produisent donc la meme sorte d'APK, pour que l'un puisse toujours
+REM  remplacer l'autre sans desinstaller.
 REM
 REM  `call` est indispensable : sous Windows `flutter` est lui-meme un .bat, et
 REM  un .bat qui en appelle un autre sans `call` lui passe la main sans jamais
 REM  la reprendre.
-call flutter build apk --release
+call flutter build apk --release --split-per-abi
 if errorlevel 1 goto erreur
 
 echo.
 echo   [4/4] Installation sur le telephone...
 echo.
-call flutter install --release -d %TELEPHONE%
-if errorlevel 1 goto erreur
+REM  `adb install -r` remplace l'application en place, en gardant ses donnees.
+set "COMPTE_RENDU=%TEMP%\installation-android.txt"
+"%ADB%" -s %TELEPHONE% install -r "build\app\outputs\flutter-apk\%APK%" > "%COMPTE_RENDU%" 2>&1
+type "%COMPTE_RENDU%"
+findstr /C:"Success" "%COMPTE_RENDU%" >nul || goto echec_installation
 
 echo.
 echo   ============================================
@@ -84,6 +101,34 @@ echo   ============================================
 echo.
 pause
 exit /b 0
+
+:echec_installation
+findstr /C:"VERSION_DOWNGRADE" "%COMPTE_RENDU%" >nul && goto version_plus_ancienne
+
+echo.
+echo   ============================================
+echo     L'installation a echoue.
+echo   ============================================
+echo.
+echo   Le message d'adb est affiche juste au-dessus.
+echo   Copiez-le et envoyez-le a Claude.
+echo.
+pause
+exit /b 1
+
+:version_plus_ancienne
+echo.
+echo   ============================================
+echo     Une version plus recente est installee.
+echo   ============================================
+echo.
+echo   Android refuse de revenir en arriere. Desinstallez
+echo   l'application du telephone, puis relancez ce fichier :
+echo   ce sera la derniere fois, les versions suivantes
+echo   s'installeront par-dessus.
+echo.
+pause
+exit /b 1
 
 :pas_de_telephone
 findstr /C:"unauthorized" "%APPAREILS%" >nul && goto non_autorise

@@ -4,7 +4,7 @@ description: >-
   debits, pressions, photos et PDF mis en page. Tout reste sur l'appareil,
   sans compte ni connexion.
 publish_to: "none"
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   # Dart 3.6 = Flutter 3.27, première version où ThemeData.cardTheme attend un
