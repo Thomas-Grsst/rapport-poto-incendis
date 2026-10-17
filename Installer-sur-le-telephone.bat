@@ -30,13 +30,18 @@ echo.
 REM  `flutter install` ne compile pas : il installe l'APK deja present sur le
 REM  disque. Sans cette etape, le `git pull` ci-dessus ne servait a rien et on
 REM  reinstallait indefiniment la version precedente.
-flutter build apk --release
+REM
+REM  `call` est indispensable : sous Windows `flutter` est lui-meme un .bat,
+REM  et un .bat qui en appelle un autre sans `call` lui passe la main sans
+REM  jamais la reprendre. La suite du script n'etait jamais executee, et la
+REM  fenetre se fermait sans rien dire.
+call flutter build apk --release
 if errorlevel 1 goto erreur
 
 echo.
 echo   [3/3] Installation sur le telephone...
 echo.
-flutter install --release
+call flutter install --release
 if errorlevel 1 goto erreur
 
 echo.
