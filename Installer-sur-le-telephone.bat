@@ -19,6 +19,9 @@ echo.
 
 echo   [1/4] Recuperation de la derniere version...
 echo.
+REM  Flutter reecrit pubspec.lock a chaque compilation : on le remet comme
+REM  dans le depot, sinon git refuse la mise a jour.
+git checkout -- pubspec.lock 2>nul
 git pull
 if errorlevel 1 goto erreur
 
